@@ -40,14 +40,16 @@ def index():
 """
 # [END form]
 
-
 # [START upload]
 @app.route('/upload', methods=['POST'])
 def upload():
     """Process the uploaded file and upload it to Google Cloud Storage."""
     uploaded_file = request.files.get('file')
 
+    return cool.verycool(uploaded_file)
+
     if not uploaded_file:
+        
         return 'No file uploaded.', 400
 
     # Create a Cloud Storage client.
@@ -66,7 +68,7 @@ def upload():
 
     # The public URL can be used to directly access the uploaded file via HTTP.
     # return blob.public_url
-    return cool.verycool()
+
 # [END upload]
 
 
