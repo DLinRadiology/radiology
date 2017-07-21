@@ -46,8 +46,6 @@ def upload():
     """Process the uploaded file and upload it to Google Cloud Storage."""
     uploaded_file = request.files.get('file')
 
-    return cool.verycool(uploaded_file)
-
     if not uploaded_file:
         
         return 'No file uploaded.', 400
@@ -65,6 +63,8 @@ def upload():
         uploaded_file.read(),
         content_type=uploaded_file.content_type
     )
+
+    return cool.verycool(uploaded_file)
 
     # The public URL can be used to directly access the uploaded file via HTTP.
     # return blob.public_url

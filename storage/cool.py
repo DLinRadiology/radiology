@@ -19,7 +19,6 @@ def verycool(image):
     
     model = load_model('model/kerasmodel')
 
-#a = (model.predict_classes(np.reshape(scipy.misc.imread("model/outfile.jpg"),[1,100,100,3]), verbose=0))
     a = (model.predict_classes(np.reshape(image,[1,100,100,3]), verbose=0))
     if (a == 1):
         return ("it´s a frontal image")
@@ -32,5 +31,3 @@ def verycool(image):
     arr_max = np.max(array)
     normalized = (array - arr_min) / (arr_max - arr_min + K.epsilon())
     return (max_value - min_value) * normalized + min_value"""
-
-#print(verycool())
