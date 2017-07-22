@@ -16,6 +16,7 @@
 import logging
 import os
 import cool
+import heartseg
 
 from flask import Flask, request
 from google.cloud import storage
@@ -49,6 +50,9 @@ def upload():
     if not uploaded_file:
         
         return 'No file uploaded.', 400
+    
+    heartseg.segment(uploaded_file)
+    return cool.verycool(uploaded_file)
 
     # Create a Cloud Storage client.
     gcs = storage.Client()
@@ -64,7 +68,7 @@ def upload():
         content_type=uploaded_file.content_type
     )
 
-    return cool.verycool(uploaded_file)
+
 
     # The public URL can be used to directly access the uploaded file via HTTP.
     # return blob.public_url

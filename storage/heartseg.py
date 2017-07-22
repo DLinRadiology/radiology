@@ -75,31 +75,32 @@ def preprocess(imgs):
     imgs_p = imgs_p[..., np.newaxis]
     return imgs_p
 
-model2=get_unet()
+def segment(image):
+    model2=get_unet()
 
-model2.load_weights("kerasmodelheartweights")
+    model2.load_weights("kerasmodelheartweights")
 
-imgs_test = scipy.misc.imread("outfile.jpg")
-imgs_test = scipy.misc.imresize(imgs_test[:,:,1], [96,96])
-imgs_test = imgs_test[..., np.newaxis]
-imgs_test = imgs_test[np.newaxis, ...]
-imgs_test = imgs_test.astype('float32')
+    imgs_test = scipy.misc.imread(image)
+    imgs_test = scipy.misc.imresize(imgs_test[:,:,1], [96,96])
+    imgs_test = imgs_test[..., np.newaxis]
+    imgs_test = imgs_test[np.newaxis, ...]
+    imgs_test = imgs_test.astype('float32')
 
-mean = np.mean(imgs_test)  # mean for data centering
-std = np.std(imgs_test)  # std for data normalization
+    mean = np.mean(imgs_test)  # mean for data centering
+    std = np.std(imgs_test)  # std for data normalization
 
-imgs_test -= mean
-imgs_test /= std
+    imgs_test -= mean
+    imgs_test /= std
 
-pred = model2.predict(imgs_test)
+    pred = model2.predict(imgs_test)
 
-plt.imshow(imgs_test[0,:,:,0], cmap='Greys_r')
-plt.axis('off')
-res = pred[0,:,:,0]
-res [ res<=0.9 ] = np.nan
-plt.savefig('raw.png')
-plt.imshow(pred[0,:,:,0],  alpha=0.5, cmap='Reds') 
-plt.savefig('heart.png')
+    plt.imshow(imgs_test[0,:,:,0], cmap='Greys_r')
+    plt.axis('off')
+    res = pred[0,:,:,0]
+    res [ res<=0.9 ] = np.nan
+    plt.savefig('raw.png')
+    plt.imshow(pred[0,:,:,0],  alpha=0.5, cmap='Reds') 
+    plt.savefig('heart.png')
 
 
-plt.show()
+    #return (plt.show())

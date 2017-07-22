@@ -13,7 +13,6 @@ def verycool(image):
     image = normalize(image)
 
     model = load_model('model/kerasmodel')
-    # a = model.predict_classes(np.reshape(scipy.misc.imread("model/outfile.jpg"),[1, 100, 100, 3]), verbose=0)
     a = model.predict_classes(np.reshape(image, [1, 100, 100, 3]), verbose=0)
     return "it´s a {} image".format('frontal' if a == 1 else 'lateral')
 
