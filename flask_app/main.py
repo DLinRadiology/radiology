@@ -1,4 +1,5 @@
 import os
+import logging
 import datetime
 
 from flask import Flask, request, redirect, url_for
@@ -130,13 +131,13 @@ def upload_hearth_segmentation_done():
     return "Thank you for your help!"
 
 
-# @app.errorhandler(500)
-# def server_error(e):
-#     logging.exception('An error occurred during a request.')
-#     return """
-#     An internal error occurred: <pre>{}</pre>
-#     See logs for full stacktrace.
-#     """.format(e), 500
+@app.errorhandler(500)
+def server_error(e):
+    logging.exception('An error occurred during a request.')
+    return """
+    An internal error occurred: <pre>{}</pre>
+    See logs for full stacktrace.
+    """.format(e), 500
 
 
 if __name__ == '__main__':
