@@ -9,12 +9,12 @@ from keras.models import Model
 from keras.optimizers import Adam
 from keras import backend
 
-from .model import Model
+from .model import RadioModel
 
 MODEL_DIR = 'saved_models'
 
 
-class ModelHearthSegmentation(Model):
+class ModelHearthSegmentation(RadioModel):
     def __init__(self):
         super(ModelHearthSegmentation, self).__init__()
 

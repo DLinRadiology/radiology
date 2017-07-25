@@ -80,36 +80,58 @@ def upload_hearth_segmentation():
     if not uploaded_file:
         return 'No file uploaded.', 400
 
-    app.logger.info(uploaded_file.__class__)
-    app.logger.info(uploaded_file.content_type)
-    app.logger.info(uploaded_file.content_length)
-    app.logger.info(uploaded_file.read())
-
     model = ModelHearthSegmentation()
     orig, pred = model.predict(uploaded_file)
 
     # SAVE ORIGINAL AND PREDICTED IMAGES
-    orig_fs = get_file_storage(orig, name='orig.png')
-    pred_fs = get_file_storage(pred, name='pred.png')
-    orig_url = storage.upload_file(orig_fs, folder='temp')
-    pred_url = storage.upload_file(pred_fs, folder='temp')
+    orig_fs = get_file_storage(orig, filename='orig.jpg', cmap='Greys_r')
+    pred_fs = get_file_storage(pred, filename='pred.jpg', cmap='Reds')
 
-    return redirect(url_for('upload_hearth_segmentation', url1=orig_url, url2=pred_url))
+    # orig_fs.save('/Users/Edu/Temp/orig.png')
+    # pred_fs.save('/Users/Edu/Temp/pred.png')
 
+    orig_url = storage.upload_from_string(orig_fs, folder='temp')
+    pred_url = storage.upload_from_string(pred_fs, folder='temp')
 
-@app.route('/upload_hearth_segmentation/<url1>/<url2>')
-def hearth_segmentation_finalize(url1, url2):
-    pass
-    # ADD IMAGES AND RETURN FORM
+    app.logger.info(orig_url)
+    app.logger.info(pred_url)
 
-
-@app.errorhandler(500)
-def server_error(e):
-    logging.exception('An error occurred during a request.')
     return """
-    An internal error occurred: <pre>{}</pre>
-    See logs for full stacktrace.
-    """.format(e), 500
+    <form method="POST" action="/upload_hearth_segmentation_done">
+        <img src="{url1}" alt="Original">
+        <img src="{url2}" alt="Predicted">
+        <input type="hidden" value="{url2}" name="url" />
+        <br/> 
+        <label for="good">Good</label>
+        <input type="radio" name="gender" id="good" value="good"><br>
+        <label for="ok">Somewhat OK</label>
+        <input type="radio" name="gender" id="ok" value="ok"><br>
+        <label for="bad">Bad</label>
+        <input type="radio" name="gender" id="bad" value="bad"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+    """.format(url1=orig_url, url2=pred_url)
+
+
+@app.route('/upload_hearth_segmentation_done', methods=['POST'])
+def upload_hearth_segmentation_done():
+    folder = dict(
+        good="heartseg_good",
+        ok="heartseg_ok",
+        bad="heartseg_bad"
+    )[request.form['gender']]
+    # url = request.form['url']
+    storage.copy('temp/pred.jpg', '{}/pred.jpg'.format(folder))
+    return "Thank you for your help!"
+
+
+# @app.errorhandler(500)
+# def server_error(e):
+#     logging.exception('An error occurred during a request.')
+#     return """
+#     An internal error occurred: <pre>{}</pre>
+#     See logs for full stacktrace.
+#     """.format(e), 500
 
 
 if __name__ == '__main__':

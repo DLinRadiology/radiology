@@ -4,13 +4,13 @@ import numpy as np
 import scipy.misc
 from keras.models import load_model
 
-from .model import Model
+from .model import RadioModel
 from .utils import normalize
 
 MODEL_DIR = 'saved_models'
 
 
-class ModelFrontalLateral(Model):
+class ModelFrontalLateral(RadioModel):
     def __init__(self, img_size=(100, 100, 3)):
         super(ModelFrontalLateral, self).__init__()
         self.img_size = img_size

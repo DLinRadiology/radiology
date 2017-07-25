@@ -27,7 +27,7 @@ class Bucket(object):
     def __init__(self, gcs, bucket_name):
         self.bucket = gcs.get_bucket(bucket_name)   # Get the bucket that the file will be uploaded to.
 
-    def upload_file(self, uploaded_file, folder=None, file_name=None):
+    def upload_from_string(self, uploaded_file, folder=None, file_name=None):
         file_path = file_name or uploaded_file.filename
         if folder is not None:
             file_path = os.path.join(folder, file_path)
@@ -37,3 +37,18 @@ class Bucket(object):
             content_type=uploaded_file.content_type
         )
         return blob.public_url
+
+    def upload_from_filename(self, filepath, content_type, folder=None, file_name=None):
+        file_path = file_name or os.path.basename(filepath)
+        if folder is not None:
+            file_path = os.path.join(folder, file_path)
+        blob = self.bucket.blob(file_path)
+        blob.upload_from_filename(
+            filename=filepath,
+            content_type=content_type
+        )
+        return blob.public_url
+
+    def copy(self, from_, to_):
+        blob = self.bucket.get_blob(from_)
+        self.bucket.copy_blob(blob, self.bucket, to_)
