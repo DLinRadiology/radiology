@@ -1,20 +1,7 @@
 from collections import Sequence
 
-import keras
-import numpy as np
-import scipy.misc
-from keras.models import load_model
 from keras import backend
-
-
-def verycool(image):
-    image = scipy.misc.imread(image)
-    image = scipy.misc.imresize(image, [100, 100, 3])
-    image = normalize(image)
-
-    model = load_model('model/kerasmodel')
-    a = model.predict_classes(np.reshape(image, [1, 100, 100, 3]), verbose=0)
-    return "it´s a {} image".format('frontal' if a == 1 else 'lateral')
+import numpy as np
 
 
 def normalize(array, min_max_values=None):
@@ -41,4 +28,3 @@ def normalize(array, min_max_values=None):
         max_value = min_max_values[1]
         normalized = (max_value - min_value) * normalized + min_value
     return normalized
-
