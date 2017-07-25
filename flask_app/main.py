@@ -1,5 +1,5 @@
 import os
-import logging
+import datetime
 
 from flask import Flask, request, redirect, url_for
 
@@ -22,11 +22,11 @@ storage = Storage('wired-plateau-167712')[CLOUD_STORAGE_BUCKET]
 
 @app.route('/')
 def index():
+    # <li><a href="/test">test</a></li>
     return """
     <ul>
         <li><a href="/frontal_lateral">classify chest x-ray to frontal or lateral</a></li>
         <li><a href="/hearth_segmentation">segment heart on frontal chest x-ray</a></li>
-        <li><a href="/test">test</a></li>
     </ul>
     """
 
@@ -93,8 +93,8 @@ def upload_hearth_segmentation():
     orig_url = storage.upload_from_string(orig_fs, folder='temp')
     pred_url = storage.upload_from_string(pred_fs, folder='temp')
 
-    app.logger.info(orig_url)
-    app.logger.info(pred_url)
+    # app.logger.info(orig_url)
+    # app.logger.info(pred_url)
 
     return """
     <form method="POST" action="/upload_hearth_segmentation_done">
@@ -121,7 +121,12 @@ def upload_hearth_segmentation_done():
         bad="heartseg_bad"
     )[request.form['gender']]
     # url = request.form['url']
-    storage.copy('temp/pred.jpg', '{}/pred.jpg'.format(folder))
+    storage.copy(
+        'temp/pred.jpg',
+        '{}/pred_{}.jpg'.format(folder, datetime.datetime.now().isoformat())
+    )
+    storage.delete('temp/orig.jpg')
+    storage.delete('temp/pred.jpg')
     return "Thank you for your help!"
 
 

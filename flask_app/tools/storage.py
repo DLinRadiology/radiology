@@ -49,6 +49,9 @@ class Bucket(object):
         )
         return blob.public_url
 
-    def copy(self, from_, to_):
-        blob = self.bucket.get_blob(from_)
-        self.bucket.copy_blob(blob, self.bucket, to_)
+    def copy(self, name, new_name):
+        blob = self.bucket.get_blob(name)
+        self.bucket.copy_blob(blob, self.bucket, new_name)
+
+    def delete(self, name):
+        self.bucket.delete_blob(name)
