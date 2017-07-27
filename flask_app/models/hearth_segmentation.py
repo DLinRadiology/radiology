@@ -11,6 +11,8 @@ from keras import backend
 
 from .model import RadioModel
 
+from PIL import Image
+
 MODEL_DIR = 'saved_models'
 
 
@@ -20,7 +22,9 @@ class ModelHearthSegmentation(RadioModel):
 
     def predict(self, image):
         model2 = self.get_unet()
-        path = path = os.path.join(os.path.dirname(__file__), MODEL_DIR, 'keras_model_heart_weights')
+        path = os.path.join(os.path.dirname(__file__), MODEL_DIR, 'keras_model_heart_weights')
+        model2.load_weights(path)
+
 
         images_test = scipy.misc.imread(image)
         images_test = scipy.misc.imresize(images_test[:, :, 1], [96, 96])
@@ -35,7 +39,36 @@ class ModelHearthSegmentation(RadioModel):
         images_test /= std
 
         predicted = model2.predict(images_test)
-        return images_test[0, :, :, 0], predicted[0, :, :, 0]
+        images_test = images_test[0, :, :, 0] # back to normal 96 x 96 array
+        predicted = predicted[0,:,:,0]
+
+        images_test *= std              # returns back from normalization
+        images_test += mean             # returns back from normalization
+
+        uploaded_image = np.zeros(shape=(96, 96, 3), dtype=float) # defines new array with 3 channels
+        uploaded_image[:, :, 0] = images_test
+        uploaded_image[:, :, 1] = images_test
+        uploaded_image[:, :, 2] = images_test
+
+        predicted2 = np.zeros(shape=(96, 96, 4), dtype=float)   # 4 channels, since transparency needed on mask
+        predicted2[:, :, 0] = predicted * 255                   # 255 max value in 8 bit images
+        predicted2[:, :, 3] = predicted * 255 / 5               # Alpha/transparency channel
+
+        uploaded_image = np.asarray(images_test, np.uint8)      # this fucker took long to find
+        predicted2 = np.asarray(predicted2, np.uint8)           # changes type to that "Image" will take it
+
+        background = Image.fromarray(uploaded_image)
+        foreground = Image.fromarray(predicted2)
+
+        foreground = foreground.convert("RGBA")                 # this too needs to be done for some reason
+        background = background.convert("RGBA")
+
+        background = Image.alpha_composite(background, foreground) # the essence/magic, merges the images
+
+        merged_image = np.asarray(background)                   # back to array
+
+
+        return (uploaded_image, merged_image)
 
         # plt.imshow(images_test[0, :, :, 0], cmap='Greys_r')
         # plt.axis('off')

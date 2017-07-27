@@ -86,13 +86,13 @@ def upload_hearth_segmentation():
 
     # SAVE ORIGINAL AND PREDICTED IMAGES
     orig_fs = get_file_storage(orig, filename='orig.jpg', cmap='Greys_r')
-    pred_fs = get_file_storage(pred, filename='pred.jpg', cmap='Reds')
+    pred_fs = get_file_storage(pred, filename='pred.jpg', cmap='Greys_r')
 
     # orig_fs.save('/Users/Edu/Temp/orig.png')
     # pred_fs.save('/Users/Edu/Temp/pred.png')
 
-    orig_url = storage.upload_from_string(orig_fs, folder='temp')
-    pred_url = storage.upload_from_string(pred_fs, folder='temp')
+    orig_url = storage.upload_from_string(orig_fs, folder='Temp15')
+    pred_url = storage.upload_from_string(pred_fs, folder='Temp15')
 
     # app.logger.info(orig_url)
     # app.logger.info(pred_url)

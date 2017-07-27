@@ -1,4 +1,5 @@
 import io
+from PIL import Image
 try:
     from StringIO import StringIO
 except ImportError:
@@ -9,11 +10,13 @@ import matplotlib.pyplot as plt
 
 
 def image_array_to_string(arr, alpha=0.5, cmap=''):
-    plt.imshow(arr, alpha=alpha, cmap=cmap)
-    plt.axis('off')
+    #plt.imshow(arr, alpha=alpha, cmap=cmap)
+    #plt.axis('off')
     # output = StringIO()
+    image = Image.fromarray(arr)
     buf = io.BytesIO()
-    plt.savefig(buf, format='jpg')
+    image.save(format="jpeg", fp=buf)
+    #plt.savefig(buf, format='jpg')
     buf.seek(0)
     return buf
 
