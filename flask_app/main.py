@@ -7,7 +7,7 @@ from flask import Flask, request, redirect, url_for
 from tools.storage import Storage
 from tools.image_tools import get_file_storage
 from models.frontal_lateral import ModelFrontalLateral
-from models.hearth_segmentation import ModelHearthSegmentation
+from models.heart_segmentation import ModelHearthSegmentation
 
 
 app = Flask(__name__)
@@ -97,21 +97,25 @@ def upload_hearth_segmentation():
     # app.logger.info(orig_url)
     # app.logger.info(pred_url)
 
-    return """
-    <form method="POST" action="/upload_hearth_segmentation_done">
-        <img src="{url1}" alt="Original">
-        <img src="{url2}" alt="Predicted">
-        <input type="hidden" value="{url2}" name="url" />
-        <br/> 
-        <label for="good">Good</label>
-        <input type="radio" name="gender" id="good" value="good"><br>
-        <label for="ok">Somewhat OK</label>
-        <input type="radio" name="gender" id="ok" value="ok"><br>
-        <label for="bad">Bad</label>
-        <input type="radio" name="gender" id="bad" value="bad"><br><br>
-        <input type="submit" value="Submit">
-    </form>
-    """.format(url1=orig_url, url2=pred_url)
+    try:
+        return """
+        <form method="POST" action="/upload_hearth_segmentation_done">
+            <img src="{url1}" alt="Original">
+            <img src="{url2}" alt="Predicted">
+            <input type="hidden" value="{url2}" name="url" />
+            <br/> 
+            <label for="good">Good</label>
+            <input type="radio" name="gender" id="good" value="good"><br>
+            <label for="ok">Somewhat OK</label>
+            <input type="radio" name="gender" id="ok" value="ok"><br>
+            <label for="bad">Bad</label>
+            <input type="radio" name="gender" id="bad" value="bad"><br><br>
+            <input type="submit" value="Submit">
+        </form>
+        """.format(url1=orig_url, url2=pred_url)
+    finally:
+        storage.delete('temp/orig.jpg')
+        storage.delete('temp/pred.jpg')
 
 
 @app.route('/upload_hearth_segmentation_done', methods=['POST'])
@@ -126,8 +130,6 @@ def upload_hearth_segmentation_done():
         'temp/pred.jpg',
         '{}/pred_{}.jpg'.format(folder, datetime.datetime.now().isoformat())
     )
-    storage.delete('temp/orig.jpg')
-    storage.delete('temp/pred.jpg')
     return "Thank you for your help!"
 
 
