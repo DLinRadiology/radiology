@@ -20,6 +20,8 @@ except KeyError:
     CLOUD_STORAGE_BUCKET = 'tf2bucket'
 storage = Storage('wired-plateau-167712')[CLOUD_STORAGE_BUCKET]
 
+STORAGE_FOLDER_NAME = 'temp'
+
 
 @app.route('/')
 def index():
@@ -91,8 +93,8 @@ def upload_hearth_segmentation():
     # orig_fs.save('/Users/Edu/Temp/orig.png')
     # pred_fs.save('/Users/Edu/Temp/pred.png')
 
-    orig_url = storage.upload_from_string(orig_fs, folder='Temp15')
-    pred_url = storage.upload_from_string(pred_fs, folder='Temp15')
+    orig_url = storage.upload_from_string(orig_fs, folder=STORAGE_FOLDER_NAME)
+    pred_url = storage.upload_from_string(pred_fs, folder=STORAGE_FOLDER_NAME)
 
     # app.logger.info(orig_url)
     # app.logger.info(pred_url)
@@ -114,8 +116,8 @@ def upload_hearth_segmentation():
         </form>
         """.format(url1=orig_url, url2=pred_url)
     finally:
-        storage.delete('temp/orig.jpg')
-        storage.delete('temp/pred.jpg')
+        storage.delete('{}/orig.jpg'.format(STORAGE_FOLDER_NAME))
+        storage.delete('{}/pred.jpg'.format(STORAGE_FOLDER_NAME))
 
 
 @app.route('/upload_hearth_segmentation_done', methods=['POST'])
