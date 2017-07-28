@@ -99,40 +99,40 @@ def upload_hearth_segmentation():
     # app.logger.info(orig_url)
     # app.logger.info(pred_url)
 
-    try:
-        return """
-        <form method="POST" action="/upload_hearth_segmentation_done">
-            <img src="{url1}" alt="Original">
-            <img src="{url2}" alt="Predicted">
-            <input type="hidden" value="{url2}" name="url" />
-            <br/> 
-            <label for="good">Good</label>
-            <input type="radio" name="gender" id="good" value="good"><br>
-            <label for="ok">Somewhat OK</label>
-            <input type="radio" name="gender" id="ok" value="ok"><br>
-            <label for="bad">Bad</label>
-            <input type="radio" name="gender" id="bad" value="bad"><br><br>
-            <input type="submit" value="Submit">
-        </form>
-        """.format(url1=orig_url, url2=pred_url)
-    finally:
-        storage.delete('{}/orig.jpg'.format(STORAGE_FOLDER_NAME))
-        storage.delete('{}/pred.jpg'.format(STORAGE_FOLDER_NAME))
+    return """
+    <form method="POST" action="/upload_hearth_segmentation_done">
+        <img src="{url1}" alt="Original">
+        <img src="{url2}" alt="Predicted">
+        <input type="hidden" value="{url2}" name="url" />
+        <br/> 
+        <label for="good">Good</label>
+        <input type="radio" name="gender" id="good" value="good"><br>
+        <label for="ok">Somewhat OK</label>
+        <input type="radio" name="gender" id="ok" value="ok"><br>
+        <label for="bad">Bad</label>
+        <input type="radio" name="gender" id="bad" value="bad"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+    """.format(url1=orig_url, url2=pred_url)
 
 
 @app.route('/upload_hearth_segmentation_done', methods=['POST'])
 def upload_hearth_segmentation_done():
-    folder = dict(
-        good="heartseg_good",
-        ok="heartseg_ok",
-        bad="heartseg_bad"
-    )[request.form['gender']]
-    # url = request.form['url']
-    storage.copy(
-        'temp/pred.jpg',
-        '{}/pred_{}.jpg'.format(folder, datetime.datetime.now().isoformat())
-    )
-    return "Thank you for your help!"
+    try:
+        folder = dict(
+            good="heartseg_good",
+            ok="heartseg_ok",
+            bad="heartseg_bad"
+        )[request.form['gender']]
+        # url = request.form['url']
+        storage.copy(
+            'temp/pred.jpg',
+            '{}/pred_{}.jpg'.format(folder, datetime.datetime.now().isoformat())
+        )
+        return "Thank you for your help!"
+    finally:
+        storage.delete('{}/orig.jpg'.format(STORAGE_FOLDER_NAME))
+        storage.delete('{}/pred.jpg'.format(STORAGE_FOLDER_NAME))
 
 
 @app.errorhandler(500)
