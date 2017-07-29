@@ -145,7 +145,13 @@ def upload_heart_segmentation_done():
                 storage.delete(temp_path)
             except Exception:
                 pass
-    return "Thank you for your help!"
+    return """
+    Thank you for your help!<br>
+    <ul>
+        <li><a href="/..">Go back to first page</a></li>
+        <li><a href="https://dlinradiology.wordpress.com">dlinradiology.wordpress.com</a></li>
+    </ul>
+    """
 
 
 @app.errorhandler(500)
