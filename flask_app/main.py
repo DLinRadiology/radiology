@@ -20,7 +20,7 @@ except KeyError:
     CLOUD_STORAGE_BUCKET = 'tf2bucket'
 storage = Storage('wired-plateau-167712')[CLOUD_STORAGE_BUCKET]
 
-STORAGE_FOLDER_NAME = 'temp'
+TEMP_FOLDER_NAME = 'temp'
 
 
 @app.route('/')
@@ -87,14 +87,17 @@ def upload_hearth_segmentation():
     orig, pred = model.predict(uploaded_file)
 
     # SAVE ORIGINAL AND PREDICTED IMAGES
-    orig_fs = get_file_storage(orig, filename='orig.jpg', cmap='Greys_r')
-    pred_fs = get_file_storage(pred, filename='pred.jpg', cmap='Greys_r')
+    now = datetime.datetime.now().isoformat()
+    orig_fn = 'orig_{}.jpg'.format(now)
+    pred_fn = 'pred_{}.jpg'.format(now)
+    orig_fs = get_file_storage(orig, filename=orig_fn, cmap='Greys_r')
+    pred_fs = get_file_storage(pred, filename=pred_fn, cmap='Greys_r')
 
     # orig_fs.save('/Users/Edu/Temp/orig.png')
     # pred_fs.save('/Users/Edu/Temp/pred.png')
 
-    orig_url = storage.upload_from_string(orig_fs, folder=STORAGE_FOLDER_NAME)
-    pred_url = storage.upload_from_string(pred_fs, folder=STORAGE_FOLDER_NAME)
+    orig_url = storage.upload_from_string(orig_fs, folder=TEMP_FOLDER_NAME)
+    pred_url = storage.upload_from_string(pred_fs, folder=TEMP_FOLDER_NAME)
 
     # app.logger.info(orig_url)
     # app.logger.info(pred_url)
@@ -103,7 +106,8 @@ def upload_hearth_segmentation():
     <form method="POST" action="/upload_hearth_segmentation_done">
         <img src="{url1}" alt="Original">
         <img src="{url2}" alt="Predicted">
-        <input type="hidden" value="{url2}" name="url" />
+        <input type="hidden" value="{orig_fn}" name="orig_fn" />
+        <input type="hidden" value="{pred_fn}" name="pred_fn" />
         <br/> 
         <label for="good">Good</label>
         <input type="radio" name="gender" id="good" value="good"><br>
@@ -113,26 +117,35 @@ def upload_hearth_segmentation():
         <input type="radio" name="gender" id="bad" value="bad"><br><br>
         <input type="submit" value="Submit">
     </form>
-    """.format(url1=orig_url, url2=pred_url)
+    """.format(
+        url1=orig_url,
+        url2=pred_url,
+        orig_fn=orig_fn,
+        pred_fn=pred_fn
+    )
 
 
 @app.route('/upload_hearth_segmentation_done', methods=['POST'])
 def upload_hearth_segmentation_done():
-    try:
-        folder = dict(
-            good="heartseg_good",
-            ok="heartseg_ok",
-            bad="heartseg_bad"
-        )[request.form['gender']]
-        # url = request.form['url']
-        storage.copy(
-            'temp/pred.jpg',
-            '{}/pred_{}.jpg'.format(folder, datetime.datetime.now().isoformat())
-        )
-        return "Thank you for your help!"
-    finally:
-        storage.delete('{}/orig.jpg'.format(STORAGE_FOLDER_NAME))
-        storage.delete('{}/pred.jpg'.format(STORAGE_FOLDER_NAME))
+    save_folder = dict(
+        good="heartseg_good",
+        ok="heartseg_ok",
+        bad="heartseg_bad"
+    )[request.form['gender']]
+
+    orig_fn = request.form['orig_fn']
+    pred_fn = request.form['pred_fn']
+    for fn in [orig_fn, pred_fn]:
+        temp_path = '{}/{}'.format(TEMP_FOLDER_NAME, fn)
+        copy_path = '{}/{}'.format(save_folder, fn)
+        try:
+            storage.copy(temp_path, copy_path)
+        finally:
+            try:
+                storage.delete(temp_path)
+            except Exception:
+                pass
+    return "Thank you for your help!"
 
 
 @app.errorhandler(500)
