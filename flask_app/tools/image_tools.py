@@ -6,17 +6,22 @@ except ImportError:
     from io import StringIO
 
 from werkzeug.datastructures import FileStorage
-import matplotlib.pyplot as plt
 
 
-def image_array_to_string(arr, alpha=0.5, cmap=''):
-    #plt.imshow(arr, alpha=alpha, cmap=cmap)
-    #plt.axis('off')
-    # output = StringIO()
+def image_array_to_string_mpl(arr, alpha=0.5, cmap=''):
+    import matplotlib.pyplot as plt
+    plt.imshow(arr, alpha=alpha, cmap=cmap)
+    plt.axis('off')
+    buf = io.BytesIO()
+    plt.savefig(buf, format='jpg')
+    buf.seek(0)
+    return buf
+
+
+def image_array_to_string(arr, **kwargs):
     image = Image.fromarray(arr)
     buf = io.BytesIO()
     image.save(format="jpeg", fp=buf)
-    #plt.savefig(buf, format='jpg')
     buf.seek(0)
     return buf
 

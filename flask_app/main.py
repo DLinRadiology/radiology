@@ -29,7 +29,7 @@ def index():
     return """
     <ul>
         <li><a href="/frontal_lateral">classify chest x-ray to frontal or lateral</a></li>
-        <li><a href="/hearth_segmentation">segment heart on frontal chest x-ray</a></li>
+        <li><a href="/heart_segmentation">segment heart on frontal chest x-ray</a></li>
     </ul>
     """
 
@@ -66,18 +66,18 @@ def upload_frontal_lateral():
     return "it's a {} image".format('frontal' if result == 1 else 'lateral')
 
 
-@app.route('/hearth_segmentation')
-def hearth_segmentation():
+@app.route('/heart_segmentation')
+def heart_segmentation():
     return """
-    <form method="POST" action="/upload_hearth_segmentation" enctype="multipart/form-data">
+    <form method="POST" action="/upload_heart_segmentation" enctype="multipart/form-data">
         <input type="file" name="file">
         <input type="submit">
     </form>
     """
 
 
-@app.route('/upload_hearth_segmentation', methods=['POST'])
-def upload_hearth_segmentation():
+@app.route('/upload_heart_segmentation', methods=['POST'])
+def upload_heart_segmentation():
     uploaded_file = request.files.get('file')
 
     if not uploaded_file:
@@ -103,7 +103,7 @@ def upload_hearth_segmentation():
     # app.logger.info(pred_url)
 
     return """
-    <form method="POST" action="/upload_hearth_segmentation_done">
+    <form method="POST" action="/upload_heart_segmentation_done">
         <img src="{url1}" alt="Original">
         <img src="{url2}" alt="Predicted">
         <input type="hidden" value="{orig_fn}" name="orig_fn" />
@@ -125,8 +125,8 @@ def upload_hearth_segmentation():
     )
 
 
-@app.route('/upload_hearth_segmentation_done', methods=['POST'])
-def upload_hearth_segmentation_done():
+@app.route('/upload_heart_segmentation_done', methods=['POST'])
+def upload_heart_segmentation_done():
     save_folder = dict(
         good="heartseg_good",
         ok="heartseg_ok",
@@ -145,7 +145,13 @@ def upload_hearth_segmentation_done():
                 storage.delete(temp_path)
             except Exception:
                 pass
-    return "Thank you for your help!"
+    return """
+    Thank you for your help!<br>
+    <ul>
+        <li><a href="/..">Go back to first page</a></li>
+        <li><a href="https://dlinradiology.wordpress.com">dlinradiology.wordpress.com</a></li>
+    </ul>
+    """
 
 
 @app.errorhandler(500)
