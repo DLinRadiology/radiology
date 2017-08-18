@@ -21,6 +21,7 @@ except KeyError:
 storage = Storage('wired-plateau-167712')[CLOUD_STORAGE_BUCKET]
 
 TEMP_FOLDER_NAME = 'temp'
+FILE_SHARE_NAME = 'file_share'
 
 
 @app.route('/')
@@ -28,6 +29,7 @@ def index():
     # <li><a href="/test">test</a></li>
     return """
     <ul>
+        <li><a href="/share_file">share a file</a></li>
         <li><a href="/frontal_lateral">classify chest x-ray to frontal or lateral</a></li>
         <li><a href="/heart_segmentation">segment heart on frontal chest x-ray</a></li>
     </ul>
@@ -42,6 +44,27 @@ def test():
 @app.route('/test/<url1>/<url2>')
 def test_url(url1, url2):
     return '{}-{}'.format(url1, url2)
+
+
+@app.route('/share_file')
+def share_file():
+    return """
+    <form method="POST" action="/upload_share_file" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <input type="submit">
+    </form>
+    """
+
+
+@app.route('/upload_share_file', methods=['POST'])
+def upload_share_file():
+    uploaded_file = request.files.get('file')
+
+    if not uploaded_file:
+        return 'No file uploaded.', 400
+
+    orig_url = storage.upload_from_string(uploaded_file, folder=FILE_SHARE_NAME)
+    return "{}".format(orig_url)
 
 
 @app.route('/frontal_lateral')
