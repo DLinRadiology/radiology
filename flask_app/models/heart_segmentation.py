@@ -25,7 +25,6 @@ class ModelHearthSegmentation(RadioModel):
         path = os.path.join(os.path.dirname(__file__), MODEL_DIR, 'keras_model_heart_weights')
         model2.load_weights(path)
 
-
         images_test = scipy.misc.imread(image)
         images_test = scipy.misc.imresize(images_test[:, :, 1], [96, 96])
         images_test = images_test[..., np.newaxis]
@@ -40,7 +39,7 @@ class ModelHearthSegmentation(RadioModel):
 
         predicted = model2.predict(images_test)
         images_test = images_test[0, :, :, 0] # back to normal 96 x 96 array
-        predicted = predicted[0,:,:,0]
+        predicted = predicted[0, :, :, 0]
 
         images_test *= std              # returns back from normalization
         images_test += mean             # returns back from normalization
@@ -67,8 +66,7 @@ class ModelHearthSegmentation(RadioModel):
 
         merged_image = np.asarray(background)                   # back to array
 
-
-        return (uploaded_image, merged_image)
+        return uploaded_image, merged_image
 
         # plt.imshow(images_test[0, :, :, 0], cmap='Greys_r')
         # plt.axis('off')
